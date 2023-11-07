@@ -6,8 +6,7 @@ import (
 	"database/sql/driver"
 )
 
-// OpenDriver wrap given driver with logger and return *sql.DB.
-func OpenDriver(dsn string, drv driver.Driver, lg Logger, opt ...Option) *sql.DB {
+func Connector(dsn string, drv driver.Driver, lg Logger, opt ...Option) driver.Connector {
 	opts := &options{}
 	setDefaultOptions(opts)
 
@@ -21,5 +20,10 @@ func OpenDriver(dsn string, drv driver.Driver, lg Logger, opt ...Option) *sql.DB
 		logger: &logger{logger: lg, opt: opts},
 	}
 
-	return sql.OpenDB(conn)
+	return conn
+}
+
+// OpenDriver wrap given driver with logger and return *sql.DB.
+func OpenDriver(dsn string, drv driver.Driver, lg Logger, opt ...Option) *sql.DB {
+	return sql.OpenDB(Connector(dsn, drv, lg, opt...))
 }
